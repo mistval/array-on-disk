@@ -1,0 +1,20 @@
+{
+  "name": "array-on-disk",
+  "version": "1.0.0",
+  "description": "Store a large array to disk and access it randomly without loading it into memory",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "array",
+    "disk",
+    "disc",
+    "large"
+  ],
+  "author": "Randall Schmidt",
+  "license": "MIT",
+  "dependencies": {
+    "read-nth-line": "^1.0.0"
+  }
+}
