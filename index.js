@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const nthLine = require('read-nth-line');
+const nthLine = require('nthline');
 
 const metadataFileName = 'meta.json';
 
@@ -55,7 +55,7 @@ class DiskArray {
     const fileIndex = Math.floor(index / this.linesPerFile_);
     const filePath = path.join(this.directoryPath_, `${fileIndex}.json`);
     const lineOffset = index % this.linesPerFile_;
-    const lineText = await nthLine.read(filePath, lineOffset);
+    const lineText = await nthLine.read(lineOffset, filePath);
     return JSON.parse(lineText);
   }
 }
