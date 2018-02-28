@@ -55,7 +55,7 @@ class DiskArray {
     const fileIndex = Math.floor(index / this.linesPerFile_);
     const filePath = path.join(this.directoryPath_, `${fileIndex}.json`);
     const lineOffset = index % this.linesPerFile_;
-    const lineText = await nthLine.read(lineOffset, filePath);
+    const lineText = await nthLine(lineOffset, filePath);
     return JSON.parse(lineText);
   }
 }
