@@ -15,6 +15,6 @@
   "author": "Randall Schmidt",
   "license": "MIT",
   "dependencies": {
-    "read-nth-line": "^1.0.0"
+    "read-nth-line": "^1.0.1"
   }
 }
