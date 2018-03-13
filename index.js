@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const nthLine = require('nthline');
+const LinkedListQueue = require('./linked_list_queue.js');
 
 const metadataFileName = 'meta.json';
 
@@ -25,11 +25,11 @@ function writeFile(path, content) {
 
 function readFile(path) {
   return new Promise((fulfill, reject) => {
-    fs.readFile(path, (err, data) => {
+    fs.readFile(path, 'utf8', (err, data) => {
       if (err) {
         return reject(err);
       }
-      return fulfill(JSON.parse(data));
+      return fulfill(data);
     })
   });
 }
@@ -44,6 +44,12 @@ function metadataFilePathForDirectory(directoryPath) {
   return path.join(directoryPath, metadataFileName);
 }
 
+async function getPageAsLineArray(directoryPath, fileIndex) {
+  const filePath = path.join(directoryPath, `${fileIndex}.json`);
+  const pageData = await readFile(filePath);
+  return pageData.split('\n');
+}
+
 class DiskArray {
   constructor(directoryPath, metaData) {
     this.directoryPath_ = directoryPath;
@@ -51,11 +57,26 @@ class DiskArray {
     this.linesPerFile_ = metaData.linesPerFile;
   }
 
-  async get(index) {
+  async get(index, cache) {
+    if (index >= this.length) {
+      throw new Error('Index out of bounds');
+    }
+
     const fileIndex = Math.floor(index / this.linesPerFile_);
-    const filePath = path.join(this.directoryPath_, `${fileIndex}.json`);
+
+    let page;
+    if (cache) {
+      page = cache.getItemForKey(fileIndex);
+    }
+    if (!page) {
+      page = await getPageAsLineArray(this.directoryPath_, fileIndex);
+      if (cache) {
+        cache.add(fileIndex, page);
+      }
+    }
+
     const lineOffset = index % this.linesPerFile_;
-    const lineText = await nthLine(lineOffset, filePath);
+    const lineText = page[lineOffset];
     return JSON.parse(lineText);
   }
 }
@@ -83,11 +104,12 @@ async function create(array, directoryPath, options) {
 
 async function load(directoryPath) {
   const metaDataFilePath = metadataFilePathForDirectory(directoryPath);
-  const metaData = await readFile(metaDataFilePath);
+  const metaData = JSON.parse(await readFile(metaDataFilePath));
   return new DiskArray(directoryPath, metaData);
 }
 
 module.exports = {
   create,
   load,
+  Cache: LinkedListQueue,
 };

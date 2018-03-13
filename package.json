@@ -15,6 +15,5 @@
   "author": "Randall Schmidt",
   "license": "MIT",
   "dependencies": {
-    "nthline": "^1.0.1"
   }
 }
