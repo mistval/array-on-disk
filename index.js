@@ -54,7 +54,7 @@ class DiskArray {
   constructor(directoryPath, metaData, cache) {
     this.directoryPath_ = directoryPath;
     this.length = metaData.arrayLength;
-    this.linesPerFile_ = metaData.linesPerFile;
+    this.elementsPerFile_ = metaData.elementsPerFile;
     this.cache_ = cache || new LinkedListQueue(0);
   }
 
@@ -63,7 +63,7 @@ class DiskArray {
       throw new Error('Index out of bounds');
     }
 
-    const fileIndex = Math.floor(index / this.linesPerFile_);
+    const fileIndex = Math.floor(index / this.elementsPerFile_);
     const cacheKey = `${this.directoryPath_} - ${fileIndex}`;
 
     let page = this.cache_.getItemForKey(cacheKey);
@@ -72,7 +72,7 @@ class DiskArray {
       this.cache_.add(cacheKey, page);
     }
 
-    const lineOffset = index % this.linesPerFile_;
+    const lineOffset = index % this.elementsPerFile_;
     const lineText = page[lineOffset];
     return JSON.parse(lineText);
   }
@@ -82,16 +82,16 @@ async function create(array, directoryPath, options) {
   options = options || {};
   const metaDataFilePath = metadataFilePathForDirectory(directoryPath);
 
-  const linesPerFile = options.linesPerFile || 100;
+  const elementsPerFile = options.elementsPerFile || 100;
   const arrayLength = array.length;
-  const metaData = {arrayLength, linesPerFile};
+  const metaData = {arrayLength, elementsPerFile};
   await mkdirIgnoreError(directoryPath);
   await writeFile(metaDataFilePath, JSON.stringify(metaData));
 
   const writeFilePromises = [];
   let fileNumber = 0;
-  for (let i = 0; i < arrayLength; i += linesPerFile, ++fileNumber) {
-    const arrayChunk = array.slice(i, i + linesPerFile);
+  for (let i = 0; i < arrayLength; i += elementsPerFile, ++fileNumber) {
+    const arrayChunk = array.slice(i, i + elementsPerFile);
     writeFilePromises.push(writeArrayFile(directoryPath, fileNumber, arrayChunk));
   }
 
