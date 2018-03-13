@@ -68,7 +68,7 @@ class LinkedListQueue {
       this.head_ = node;
     }
 
-    this.nodeForKey_[key] = item;
+    this.nodeForKey_[key] = node;
     this.ejectHeadIfTooBig_();
   }
 
@@ -77,20 +77,24 @@ class LinkedListQueue {
       return;
     }
 
-    let previous = node.getPrevious();
-    let next = node.getNext();
+    let oldPrevious = node.getPrevious();
+    let oldNext = node.getNext();
 
-    if (previous) {
-      previous.setNext(next);
+    if (oldPrevious) {
+      oldPrevious.setNext(oldNext);
     }
-    if (next) {
-      next.setPrevious(previous);
+    if (oldNext) {
+      oldNext.setPrevious(oldPrevious);
     }
 
     node.setPrevious(this.tail_);
     node.setNext(undefined);
-
+    this.tail_.setNext(node);
     this.tail_ = node;
+
+    if (node === this.head_ && oldNext) {
+      this.head_ = oldNext;
+    }
   }
 
   ejectHeadIfTooBig_() {
@@ -106,6 +110,4 @@ class LinkedListQueue {
   }
 }
 
-module.exports = {
-  LinkedListQueue,
-}
+module.exports = LinkedListQueue;

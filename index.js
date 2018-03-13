@@ -51,13 +51,14 @@ async function getPageAsLineArray(directoryPath, fileIndex) {
 }
 
 class DiskArray {
-  constructor(directoryPath, metaData) {
+  constructor(directoryPath, metaData, cache) {
     this.directoryPath_ = directoryPath;
     this.length = metaData.arrayLength;
     this.linesPerFile_ = metaData.linesPerFile;
+    this.cache_ = cache;
   }
 
-  async get(index, cache) {
+  async get(index) {
     if (index >= this.length) {
       throw new Error('Index out of bounds');
     }
@@ -65,13 +66,13 @@ class DiskArray {
     const fileIndex = Math.floor(index / this.linesPerFile_);
 
     let page;
-    if (cache) {
-      page = cache.getItemForKey(fileIndex);
+    if (this.cache_) {
+      page = this.cache_.getItemForKey(fileIndex);
     }
     if (!page) {
       page = await getPageAsLineArray(this.directoryPath_, fileIndex);
-      if (cache) {
-        cache.add(fileIndex, page);
+      if (this.cache_) {
+        this.cache_.add(fileIndex, page);
       }
     }
 
@@ -102,10 +103,10 @@ async function create(array, directoryPath, options) {
   return new DiskArray(directoryPath, metaData);
 }
 
-async function load(directoryPath) {
+async function load(directoryPath, cache) {
   const metaDataFilePath = metadataFilePathForDirectory(directoryPath);
   const metaData = JSON.parse(await readFile(metaDataFilePath));
-  return new DiskArray(directoryPath, metaData);
+  return new DiskArray(directoryPath, metaData, cache);
 }
 
 module.exports = {
