@@ -1,10 +1,14 @@
 {
   "name": "disk-array",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Store a large array on disk and access it randomly with caching.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mistval/array-on-disk.git"
   },
   "keywords": [
     "array",
