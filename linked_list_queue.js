@@ -62,6 +62,9 @@ class LinkedListQueue {
     if (this.maxSize_ === 0) {
       return;
     }
+    if (this.nodeForKey_[key]) {
+      throw new Error('Item already exists for that key');
+    }
 
     let node = new Node(key, item);
 

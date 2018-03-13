@@ -55,7 +55,7 @@ class DiskArray {
     this.directoryPath_ = directoryPath;
     this.length = metaData.arrayLength;
     this.linesPerFile_ = metaData.linesPerFile;
-    this.cache_ = cache;
+    this.cache_ = cache || new LinkedListQueue(0);
   }
 
   async get(index) {
@@ -66,15 +66,10 @@ class DiskArray {
     const fileIndex = Math.floor(index / this.linesPerFile_);
     const cacheKey = `${this.directoryPath_} - ${fileIndex}`;
 
-    let page;
-    if (this.cache_) {
-      page = this.cache_.getItemForKey(cacheKey);
-    }
+    let page = this.cache_.getItemForKey(cacheKey);
     if (!page) {
       page = await getPageAsLineArray(this.directoryPath_, fileIndex);
-      if (this.cache_) {
-        this.cache_.add(cacheKey, page);
-      }
+      this.cache_.add(cacheKey, page);
     }
 
     const lineOffset = index % this.linesPerFile_;
