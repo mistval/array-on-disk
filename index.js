@@ -64,15 +64,16 @@ class DiskArray {
     }
 
     const fileIndex = Math.floor(index / this.linesPerFile_);
+    const cacheKey = `${this.directoryPath_} - ${fileIndex}`;
 
     let page;
     if (this.cache_) {
-      page = this.cache_.getItemForKey(fileIndex);
+      page = this.cache_.getItemForKey(cacheKey);
     }
     if (!page) {
       page = await getPageAsLineArray(this.directoryPath_, fileIndex);
       if (this.cache_) {
-        this.cache_.add(fileIndex, page);
+        this.cache_.add(cacheKey, page);
       }
     }
 

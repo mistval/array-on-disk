@@ -31,6 +31,16 @@ class Node {
   }
 }
 
+function debugPrintKeys(head) {
+  let next = head;
+  let keys = [];
+  while (next) {
+    keys.push(next.getKey());
+    next = next.getNext();
+  }
+  console.log(`Keys:  + ${JSON.stringify(keys)}`);
+}
+
 class LinkedListQueue {
   constructor(maxSize) {
     this.maxSize_ = maxSize;
